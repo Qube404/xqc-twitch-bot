@@ -1,3 +1,5 @@
+use std::sync::mpsc::Sender;
+
 use tokio;
 
 use twitch_irc::login::StaticLoginCredentials;
@@ -7,7 +9,7 @@ use twitch_irc::TwitchIRCClient;
 use twitch_irc::message::ServerMessage;
 
 // Reads xqc's messages from his twitch chat.
-pub async fn read_xqc_messages() {
+pub async fn read_xqc_messages(tx: Sender<String>) {
     let config = ClientConfig::default();
     let (mut incoming_messages, client) =
         TwitchIRCClient::<SecureTCPTransport, StaticLoginCredentials>::new(config);
@@ -17,7 +19,7 @@ pub async fn read_xqc_messages() {
             match message {
                 ServerMessage::Privmsg(message) => {
                     if message.message_text == "test" {
-                        println!("Message: {}", message.message_text);
+                        tx.send(message.message_text).unwrap();
                     }
                 }
 

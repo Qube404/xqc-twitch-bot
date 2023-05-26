@@ -1,4 +1,5 @@
 use std::env;
+use std::sync::mpsc::Receiver;
 
 use serenity::async_trait;
 use serenity::prelude::*;
@@ -31,7 +32,7 @@ impl EventHandler for Handler {
     }
 }
 
-pub async fn write_xqc_messages() {
+pub async fn write_xqc_messages(rx: Receiver<String>) {
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
 
