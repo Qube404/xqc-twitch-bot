@@ -1,11 +1,6 @@
-use std::time::Duration;
-use std::{env, sync::mpsc::SendError};
+use std::env;
 use std::sync::mpsc::Receiver;
-use std::thread;
 
-/*use serenity::async_trait;
-use serenity::prelude::*;
-use serenity::model::gateway::Ready;*/
 use serenity::prelude::{GatewayIntents, Client};
 
 // Hard coded my user ID as I don't intend this bot to message anyone else.
