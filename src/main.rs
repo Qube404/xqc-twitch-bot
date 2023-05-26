@@ -14,8 +14,11 @@ async fn main() {
 
     let (tx, rx): (Sender<String>, Receiver<String>) = mpsc::channel();
 
-    twitch_connection::read_xqc_messages(tx)
-        .await;
+    tokio::spawn(async move {
+        twitch_connection::read_xqc_messages(tx)
+                .await;
+        }
+    );
 
     discord_connection::write_xqc_messages(rx)
         .await;

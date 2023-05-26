@@ -10,6 +10,8 @@ use twitch_irc::message::ServerMessage;
 
 // Reads xqc's messages from his twitch chat.
 pub async fn read_xqc_messages(tx: Sender<String>) {
+    println!("Succesfully inside twitch thread.");
+
     let config = ClientConfig::default();
     let (mut incoming_messages, client) =
         TwitchIRCClient::<SecureTCPTransport, StaticLoginCredentials>::new(config);
@@ -19,7 +21,7 @@ pub async fn read_xqc_messages(tx: Sender<String>) {
             match message {
                 ServerMessage::Privmsg(message) => {
                     if message.message_text == "test" {
-                        tx.send(message.message_text).unwrap();
+                        tx.send(message.message_text).expect("Could not send message");
                     }
                 }
 
@@ -30,9 +32,9 @@ pub async fn read_xqc_messages(tx: Sender<String>) {
 
     client
         .join("xqc".to_owned())
-        .unwrap();
+        .expect("Could not join channel");
 
     join_handle
         .await
-        .unwrap();
+        .expect("Join handle failed.");
 }

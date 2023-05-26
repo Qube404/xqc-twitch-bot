@@ -1,38 +1,19 @@
-use std::env;
+use std::time::Duration;
+use std::{env, sync::mpsc::SendError};
 use std::sync::mpsc::Receiver;
+use std::thread;
 
-use serenity::async_trait;
+/*use serenity::async_trait;
 use serenity::prelude::*;
-use serenity::model::gateway::Ready;
+use serenity::model::gateway::Ready;*/
 use serenity::prelude::{GatewayIntents, Client};
 
 // Hard coded my user ID as I don't intend this bot to message anyone else.
 const QUBE_ID: u64 = 266059446159933452;
 
-struct Handler;
-
-#[async_trait]
-impl EventHandler for Handler {
-    // Using the ready event as it is triggered as soon as the bot connects.
-    // The bot should always be ready to send a message from the twitch api
-    // so it starts as soon as the bot is connected as opposed to waiting 
-    // for some discord reliant event.
-    async fn ready(&self, ctx: Context, _data: Ready) {
-        println!("Connected");
-        let user = ctx
-            .http
-            .get_user(QUBE_ID)
-            .await
-            .expect("Expected a valid user");
-
-        user
-            .direct_message(&ctx, |m| m.content("Test"))
-            .await
-            .expect("Expected message to send");
-    }
-}
-
 pub async fn write_xqc_messages(rx: Receiver<String>) {
+    println!("Succesfully inside discord thread.");
+
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
 
@@ -40,9 +21,23 @@ pub async fn write_xqc_messages(rx: Receiver<String>) {
 
     let mut client =
         Client::builder(&token, intents)
-        .event_handler(Handler)
         .await
         .expect("Err creating client");
+
+    let user = client
+        .cache_and_http
+        .http
+        .get_user(QUBE_ID)
+        .await
+        .expect("Expected a valid user");
+
+    let cache_http = &client
+        .cache_and_http;
+
+    for receiver in rx {
+        user.direct_message(cache_http, |m| m.content(receiver)).await.unwrap();
+        thread::sleep(Duration::from_millis(100));
+    }
 
     if let Err(why) = client.start().await {
         println!("Client error: {:?}", why);
