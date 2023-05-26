@@ -9,8 +9,18 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn ready(&self, _ctx: Context, _data: Ready) {
+    async fn ready(&self, ctx: Context, data: Ready) {
         println!("Connected");
+        let user = ctx
+            .http
+            .get_user(266059446159933452)
+            .await
+            .expect("Expected a valid user");
+
+        user
+            .direct_message(&ctx, |m| m.content("Test"))
+            .await
+            .expect("Expected message to send");
     }
 }
 
