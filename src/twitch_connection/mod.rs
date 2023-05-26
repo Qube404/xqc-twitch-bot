@@ -18,14 +18,10 @@ pub async fn read_xqc_messages(tx: Sender<String>) {
 
     let join_handle = tokio::task::spawn(async move {
         while let Some(message) = incoming_messages.recv().await {
-            match message {
-                ServerMessage::Privmsg(message) => {
-                    if message.message_text == "test" {
-                        tx.send(message.message_text).expect("Could not send message");
-                    }
+            if let ServerMessage::Privmsg(message) = message {
+                if message.sender.login.as_str() == "qube_404" {
+                    tx.send(message.message_text).expect("Could not send message");
                 }
-
-                _ => ()
             }
         }
     });

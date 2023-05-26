@@ -36,7 +36,6 @@ pub async fn write_xqc_messages(rx: Receiver<String>) {
 
     for receiver in rx {
         user.direct_message(cache_http, |m| m.content(receiver)).await.unwrap();
-        thread::sleep(Duration::from_millis(100));
     }
 
     if let Err(why) = client.start().await {
