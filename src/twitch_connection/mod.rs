@@ -20,7 +20,7 @@ pub async fn read_xqc_messages(tx: Sender<String>) {
         while let Some(message) = incoming_messages.recv().await {
             if let ServerMessage::Privmsg(message) = message {
                 if message.sender.login.to_lowercase().as_str() == "xqc" ||
-                   message.message_text == "ping test" {
+                   message.message_text == "ping test" { 
                     tx.send(message.message_text).expect("Could not send message");
                 }
             }

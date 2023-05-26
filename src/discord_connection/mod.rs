@@ -30,7 +30,11 @@ pub async fn write_xqc_messages(rx: Receiver<String>) {
         .cache_and_http;
 
     for receiver in rx {
-        user.direct_message(cache_http, |m| m.content(receiver)).await.unwrap();
+        if receiver == "ping test" {
+            println!("Succesfully received ping!");
+        } else {
+            user.direct_message(cache_http, |m| m.content(receiver)).await.unwrap();
+        }
     }
 
     if let Err(why) = client.start().await {
