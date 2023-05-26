@@ -1,8 +1,14 @@
+use std::env;
+
 use serenity::async_trait;
 use serenity::prelude::*;
 use serenity::model::gateway::Ready;
+use serenity::prelude::{GatewayIntents, Client};
 
-pub struct Handler;
+// Hard coded my user ID as I don't intend this bot to message anyone else.
+const QUBE_ID: u64 = 266059446159933452;
+
+struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
@@ -14,7 +20,7 @@ impl EventHandler for Handler {
         println!("Connected");
         let user = ctx
             .http
-            .get_user(super::QUBE_ID)
+            .get_user(QUBE_ID)
             .await
             .expect("Expected a valid user");
 
@@ -22,5 +28,22 @@ impl EventHandler for Handler {
             .direct_message(&ctx, |m| m.content("Test"))
             .await
             .expect("Expected message to send");
+    }
+}
+
+pub async fn write_xqc_messages() {
+    let token = env::var("DISCORD_TOKEN")
+        .expect("Expected a token in the environment");
+
+    let intents = GatewayIntents::DIRECT_MESSAGES;
+
+    let mut client =
+        Client::builder(&token, intents)
+        .event_handler(Handler)
+        .await
+        .expect("Err creating client");
+
+    if let Err(why) = client.start().await {
+        println!("Client error: {:?}", why);
     }
 }
